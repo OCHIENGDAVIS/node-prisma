@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { userCreateOrUpdateValidator } from '../middlewares/user.js';
 import {
   getAllUser,
   createUser,
@@ -9,8 +10,8 @@ import {
 const userRouter = Router();
 
 userRouter.get('/users', getAllUser);
-userRouter.post('/users', createUser);
-userRouter.patch('/users/:id', updateUser);
+userRouter.post('/users', userCreateOrUpdateValidator, createUser);
+userRouter.patch('/users/:id', userCreateOrUpdateValidator, updateUser);
 userRouter.delete('/users/:id', deleteUser);
 
 export { userRouter };

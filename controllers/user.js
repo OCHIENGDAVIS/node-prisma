@@ -39,6 +39,7 @@ export const createUser = async (req, res, next) => {
     });
     return res.status(201).json({ msg: 'sucess', user });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ msg: 'error', error: error.message });
   }
 };
@@ -49,7 +50,6 @@ export const updateUser = async (req, res) => {
     const newUserName = req.body.username;
 
     const existingUser = await getUserByID(id);
-    console.log(existingUser);
     if (!existingUser) {
       return res
         .status(400)

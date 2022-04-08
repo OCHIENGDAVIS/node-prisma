@@ -6,13 +6,14 @@ import {
   updatePost,
   deletePost,
 } from '../controllers/post.js';
+import { postCreateOrUpdateValidator } from '../middlewares/post.js';
 
 const postRouter = Router();
 
 postRouter.get('/posts', getAllPosts);
-postRouter.post('/posts', createPost);
+postRouter.post('/posts', postCreateOrUpdateValidator, createPost);
 postRouter.get('/posts/:id', getPost);
-postRouter.patch('/posts/:id', updatePost);
+postRouter.patch('/posts/:id', postCreateOrUpdateValidator, updatePost);
 postRouter.delete('/posts/:id', deletePost);
 
 export { postRouter };
