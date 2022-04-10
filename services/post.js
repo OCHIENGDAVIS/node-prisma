@@ -4,15 +4,23 @@ const prisma = new PrismaClient();
 
 export class PostService {
   getAllPosts = async () => {
-    const allPosts = await prisma.post.findMany();
-    return allPosts;
+    return await prisma.post.findMany({
+      include: { author: true },
+    });
+  };
+
+  getPost = async (id) => {
+    return await prisma.post.findUnique({
+      where: {
+        id,
+      },
+    });
   };
 
   createPost = async (post) => {
-    const post = await prisma.post.create({
+    return await prisma.post.create({
       data: post,
     });
-    return post;
   };
 
   editPost = async (postId, data) => {
@@ -26,11 +34,10 @@ export class PostService {
   };
 
   deletePost = async (postId) => {
-    const deletedPost = await prisma.post.delete({
+    return await prisma.post.delete({
       where: {
         id: postId,
       },
     });
-    return deletedPost;
   };
 }
