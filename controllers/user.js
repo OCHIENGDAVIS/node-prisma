@@ -1,20 +1,11 @@
-import client from '@prisma/client';
-const { PrismaClient } = client;
+import { UserService } from '../services/user.js';
 
-import {
-  getUserByEmail,
-  getUserByUsername,
-  getUserByID,
-} from '../utils/utils.js';
+const userService = new UserService();
 
-const prisma = new PrismaClient();
-
-export const getAllUser = async (req, res, next) => {
+export const getAllUsers = async (req, res, next) => {
   try {
-    const allUser = await prisma.user.findMany({
-      include: { posts: true },
-    });
-    return res.status(200).json({ users: allUser, msg: 'sucess' });
+    const allUsers = await userService.getAllusers();
+    return res.status(200).json({ users: allUsers, msg: 'sucess' });
   } catch (error) {
     return res.status(500).json({ msg: 'error', error: error.message });
   }
@@ -23,21 +14,17 @@ export const getAllUser = async (req, res, next) => {
 export const createUser = async (req, res, next) => {
   try {
     const { email, username } = req.body;
-    const userEmailExists = await getUserByEmail(email);
-    if (userEmailExists) {
+    const emailIsUnique = await userService.emailIsUnique(email);
+    if (!emailIsUnique) {
       return res.status(400).json({ msg: 'error: email must be unique' });
     }
-    const usernameExists = await getUserByUsername(username);
-    if (usernameExists) {
+    const usernameIsUnique = await userService.usernameIsUnique(username);
+    if (!usernameIsUnique) {
       return res.status(400).json({ msg: 'error: username must be unique' });
     }
-    const user = await prisma.user.create({
-      data: {
-        email,
-        username,
-      },
-    });
-    return res.status(201).json({ msg: 'sucess', user });
+    const data = { email, username };
+    const newUser = await userService.createUser(data);
+    return res.status(201).json({ msg: 'sucess', newUser });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ msg: 'error', error: error.message });
@@ -47,19 +34,13 @@ export const createUser = async (req, res, next) => {
 export const updateUser = async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const newUserName = req.body.username;
-
-    const existingUser = await getUserByID(id);
+    const existingUser = await userService.getUserById(id);
     if (!existingUser) {
       return res
         .status(400)
         .json({ msg: `error: User with the id ${id} does not exists` });
     }
-    const user = await prisma.user.update({
-      where: { id },
-      data: { username: newUserName },
-      include: { posts: true },
-    });
+    const user = await userService.updateUser(id, req.body);
     return res.status(200).json({ msg: 'sucess', user });
   } catch (error) {
     return res.status(500).json({ msg: 'error', error: error.message });
@@ -69,14 +50,14 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   const id = Number(req.params.id);
   try {
-    const existingUser = await getUserByID(id);
+    const existingUser = await userService.getUserById(id);
     if (!existingUser) {
       return res.status(400).json({
         msg: 'error',
         error: `User with user id ${id} does not exists`,
       });
     }
-    const user = await prisma.user.delete({ where: { id } });
+    const user = await userService.deleteUser(id);
     return res.status(200).json({ msg: 'sucess', user });
   } catch (error) {
     return res.status(500).json({ msg: 'error', error: error.message });

@@ -8,7 +8,7 @@ export const userCreateOrUpdateValidator = (req, res, next) => {
   });
   const { error, value } = schema.validate(body);
   if (error) {
-    res
+    return res
       .status(400)
       .json({ type: 'error', error: error.details.map((e) => e.message) });
   }

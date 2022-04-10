@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { userCreateOrUpdateValidator } from '../middlewares/user.js';
 import {
-  getAllUser,
+  getAllUsers,
   createUser,
   updateUser,
   deleteUser,
@@ -9,7 +9,7 @@ import {
 
 const userRouter = Router();
 
-userRouter.get('/users', getAllUser);
+userRouter.get('/users', getAllUsers);
 userRouter.post('/users', userCreateOrUpdateValidator, createUser);
 userRouter.patch('/users/:id', userCreateOrUpdateValidator, updateUser);
 userRouter.delete('/users/:id', deleteUser);
